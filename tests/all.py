@@ -9,7 +9,7 @@ import re as regex
 
 hmacSecret = 'testhmacpass'
 
-class TestCase(ModuleTestCase('../build/libsession_gate.so')):
+class TestCase(ModuleTestCase('../build/libsessiongate.so')):
     def testStart(self):
         with self.redis() as r:
             with self.assertRaises(ResponseError) as context:

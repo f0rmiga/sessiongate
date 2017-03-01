@@ -2,8 +2,8 @@
 // Created by Thulio Ferraz Assis on 2017-02-27.
 //
 
-#ifndef SESSION_GATE_UTILS_H
-#define SESSION_GATE_UTILS_H
+#ifndef SESSIONGATE_UTILS_H
+#define SESSIONGATE_UTILS_H
 
 
 #include <boost/algorithm/string.hpp>
@@ -27,4 +27,4 @@ std::string signStr(const byte *key, const size_t keyLength, const char *str);
 const char *parseAndValidateToken(RedisModuleCtx *ctx, const byte *signKey, const size_t signKeyLen, const char *token, const size_t tokenLen, RedisModuleString **sessionIdRedisString);
 
 
-#endif //SESSION_GATE_UTILS_H
+#endif //SESSIONGATE_UTILS_H

@@ -2,8 +2,8 @@
 // Created by Thulio Ferraz Assis on 2017-02-27.
 //
 
-#ifndef SESSION_GATE_START_H
-#define SESSION_GATE_START_H
+#ifndef SESSIONGATE_START_H
+#define SESSIONGATE_START_H
 
 
 #include <string>
@@ -21,4 +21,4 @@
 int StartCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 
-#endif //SESSION_GATE_START_H
+#endif //SESSIONGATE_START_H

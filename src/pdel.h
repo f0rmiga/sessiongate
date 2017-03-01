@@ -2,8 +2,8 @@
 // Created by Thulio Ferraz Assis on 2017-02-28.
 //
 
-#ifndef SESSION_GATE_PDEL_H
-#define SESSION_GATE_PDEL_H
+#ifndef SESSIONGATE_PDEL_H
+#define SESSIONGATE_PDEL_H
 
 
 #include "../thirdparty/redismodule.h"
@@ -19,4 +19,4 @@
 int PDelCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 
-#endif //SESSION_GATE_PDEL_H
+#endif //SESSIONGATE_PDEL_H

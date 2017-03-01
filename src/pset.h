@@ -2,8 +2,8 @@
 // Created by Thulio Ferraz Assis on 2017-02-28.
 //
 
-#ifndef SESSION_GATE_PSET_H
-#define SESSION_GATE_PSET_H
+#ifndef SESSIONGATE_PSET_H
+#define SESSIONGATE_PSET_H
 
 
 #include "../thirdparty/redismodule.h"
@@ -19,4 +19,4 @@
 int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 
-#endif //SESSION_GATE_PSET_H
+#endif //SESSIONGATE_PSET_H

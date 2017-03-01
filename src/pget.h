@@ -2,8 +2,8 @@
 // Created by Thulio Ferraz Assis on 2017-02-28.
 //
 
-#ifndef SESSION_GATE_PGET_H
-#define SESSION_GATE_PGET_H
+#ifndef SESSIONGATE_PGET_H
+#define SESSIONGATE_PGET_H
 
 
 #include <string>
@@ -21,4 +21,4 @@
 int PGetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 
-#endif //SESSION_GATE_PGET_H
+#endif //SESSIONGATE_PGET_H

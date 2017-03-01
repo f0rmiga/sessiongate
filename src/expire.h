@@ -2,8 +2,8 @@
 // Created by Thulio Ferraz Assis on 2017-03-01.
 //
 
-#ifndef SESSION_GATE_EXPIRE_H
-#define SESSION_GATE_EXPIRE_H
+#ifndef SESSIONGATE_EXPIRE_H
+#define SESSIONGATE_EXPIRE_H
 
 
 #include "../thirdparty/redismodule.h"
@@ -18,4 +18,4 @@
 int ExpireCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 
-#endif //SESSION_GATE_EXPIRE_H
+#endif //SESSIONGATE_EXPIRE_H
