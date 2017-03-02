@@ -12,7 +12,7 @@
 #include "utils.h"
 
 /*
- * sessiongate.pset <sign_key> <token> <payload_name> <payload>
+ * sessiongate.pset <sign_key> <token> <payload_name> <payload_data>
  * Sets a payload of a session.
  * Returns OK.
  */
