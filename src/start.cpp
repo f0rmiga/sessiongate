@@ -14,7 +14,7 @@ int StartCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_ReplyWithError(ctx, "<sign_key> must have at least one character");
     }
 
-    int64_t ttl;
+    long long ttl;
     if (RedisModule_StringToLongLong(argv[2], &ttl) != REDISMODULE_OK) {
         return RedisModule_ReplyWithError(ctx, "<ttl> must be a valid integer that represents seconds");
     } else if (ttl < 0) {

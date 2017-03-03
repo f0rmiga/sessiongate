@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.2)
 project(sessiongate)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-include_directories(${CRYPTOPP_INCLUDE_DIR})
 include_directories(thirdparty)
 
 file(GLOB THIRDPARTY_SOURCE_FILES

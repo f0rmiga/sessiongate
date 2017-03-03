@@ -8,7 +8,7 @@ int ExpireCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (argc != 4) return RedisModule_WrongArity(ctx);
     RedisModule_AutoMemory(ctx);
 
-    int64_t ttl;
+    long long ttl;
     if (RedisModule_StringToLongLong(argv[3], &ttl) != REDISMODULE_OK) {
         return RedisModule_ReplyWithError(ctx, "<ttl> must be a valid integer that represents seconds");
     } else if (ttl < 0) {
