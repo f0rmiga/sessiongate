@@ -5,6 +5,6 @@ if [ ! -d "build" ]; then
 fi
 
 cd build
-cmake ..
+cmake -DSTATIC_LINK=true ..
 make
 cd ..
