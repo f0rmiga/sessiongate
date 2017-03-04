@@ -14,16 +14,21 @@ To know more about Redis modules, follow this [link](http://antirez.com/news/106
 
 ## How to build
 
-The module is written in C++ and uses Cmake. The script `run_build.sh` is a convenient script that does all the work under the `build/` directory.
+The module is written in C++ and uses Cmake. The script `run_build.sh` is a convenient script that does all the work under the `build/` directory if you have all dependencies installed. There is another convenient script called `run_docker_linux_build.sh` that spins off a new Docker container and do all the work under `docker/compile-linux/ubuntu-16.10` directory.
 
-The only dependency is [Crypto++](https://cryptopp.com/). Make sure it is properly installed. Under most Linux distributions it can be installed using the [package manager](https://www.cryptopp.com/wiki/Linux#Distribution_Package). Under OS X it can be installed using [Homebrew](http://brewformulas.org/Cryptopp).
+The dependencies are:
+- [Crypto++](https://cryptopp.com/) 5.6.3+
+- [Boost String](http://www.boost.org/doc/libs/1_63_0/doc/html/string_algo.html)
+
+If you are running Linux, most package managers do not provide the required version of Crypto++. You might want to run the Docker build process or compile the latest version of the library by yourself.
+If you are running OS X, [Homebrew](http://brewformulas.org/Cryptopp) got you covered.
 
 ## How to run tests
 
 Tests are located under `tests/` directory and are written in Python. The script `run_tests.sh` runs them.
 
 - Install Python 2.7+
-- Install rmtest package by running `pip install rmtest`
+- Install [rmtest package](https://github.com/RedisLabs/rmtest) by running `pip install rmtest`
 - Run it: `sh run_tests.sh`
 
 ## Loading the module for use
