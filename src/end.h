@@ -1,12 +1,8 @@
-//
-// Created by Thulio Ferraz Assis on 2017-02-27.
-//
+#pragma once
 
-#ifndef SESSIONGATE_END_H
-#define SESSIONGATE_END_H
+#include <string.h>
 
-
-#include "../thirdparty/redismodule.h"
+#include "redismodule.h"
 
 #include "consts.h"
 #include "utils.h"
@@ -17,6 +13,3 @@
  * Returns OK.
  */
 int EndCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
-
-#endif //SESSIONGATE_END_H

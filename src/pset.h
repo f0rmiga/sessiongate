@@ -1,12 +1,8 @@
-//
-// Created by Thulio Ferraz Assis on 2017-02-28.
-//
+#pragma once
 
-#ifndef SESSIONGATE_PSET_H
-#define SESSIONGATE_PSET_H
+#include <string.h>
 
-
-#include "../thirdparty/redismodule.h"
+#include "redismodule.h"
 
 #include "consts.h"
 #include "utils.h"
@@ -17,6 +13,3 @@
  * Returns OK.
  */
 int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
-
-#endif //SESSIONGATE_PSET_H

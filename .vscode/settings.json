@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.ipp": "cpp",
+        "*.tcc": "cpp",
+        "slist": "cpp",
+        "array": "cpp",
+        "valarray": "cpp",
+        "type_traits": "cpp"
+    }
+}
