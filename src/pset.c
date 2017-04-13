@@ -48,6 +48,7 @@ int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
         return RedisModule_ReplyWithError(ctx, "the signature contained in <token> seems to be valid, but is different from the stored signature in the session");
     }
 
+    // Get the TTL of the session to assign it to the payload
     mstime_t ttl = RedisModule_GetExpire(redisKey);
 
     RedisModule_CloseKey(redisKey);
