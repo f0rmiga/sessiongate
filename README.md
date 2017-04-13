@@ -1,6 +1,6 @@
 # Session Gate
 
-Session Gate is a Redis module to ease session management using tokens. This module does NOT do user management, don't get confused. In the real world, most of the sessions are related to a user but do you crazy logic to manage the users the way you want.
+Session Gate is a Redis module to ease session management using tokens. This module does NOT do user management, don't get confused. In the real world, most of the sessions are related to a user but do your crazy logic to manage the users the way you want.
 
 ## How it works
 
