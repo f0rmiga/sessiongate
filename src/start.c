@@ -6,11 +6,13 @@ int StartCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
         return RedisModule_WrongArity(ctx);
     RedisModule_AutoMemory(ctx);
 
+    // Extract <sign_key> and validate it
     size_t signKeyLen;
     const char *signKey = RedisModule_StringPtrLen(argv[1], &signKeyLen);
     if (signKeyLen == 0)
         return RedisModule_ReplyWithError(ctx, "<sign_key> must have at least one character");
 
+    // Extract <ttl> and validate it
     long long ttl;
     if (RedisModule_StringToLongLong(argv[2], &ttl) != REDISMODULE_OK)
         return RedisModule_ReplyWithError(ctx, "<ttl> must be a valid integer that represents seconds");
@@ -39,8 +41,7 @@ int StartCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
     RedisModule_StringSet(redisKey, RedisModule_CreateStringPrintf(ctx, signature));
 
     // Set the session TTL
-    if (ttl > 0)
-        RedisModule_SetExpire(redisKey, ttl * 1000);
+    RedisModule_SetExpire(redisKey, ttl * 1000);
 
     RedisModule_CloseKey(redisKey);
 

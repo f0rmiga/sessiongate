@@ -1,8 +1,8 @@
-#include "pset.h"
+#include "expire.h"
 
-int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
+int ExpireCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
 {
-    if (argc != 5)
+    if (argc != 4)
         return RedisModule_WrongArity(ctx);
     RedisModule_AutoMemory(ctx);
 
@@ -19,6 +19,13 @@ int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
         return RedisModule_ReplyWithError(ctx, "<token> must have at least one character");
     else if (tokenLen != TOKEN_STRLEN)
         return RedisModule_ReplyWithError(ctx, "<token> format is invalid");
+
+    // Extract <ttl> and validate it
+    long long ttl;
+    if (RedisModule_StringToLongLong(argv[3], &ttl) != REDISMODULE_OK)
+        return RedisModule_ReplyWithError(ctx, "<ttl> must be a valid integer that represents seconds");
+    if (ttl < 0)
+        return RedisModule_ReplyWithError(ctx, "<ttl> must be a valid integer that represents seconds");
 
     // Parse the token
     char tokenVersion[TOKEN_VERSION_STRLEN + 1];
@@ -48,42 +55,15 @@ int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
         return RedisModule_ReplyWithError(ctx, "the signature contained in <token> seems to be valid, but is different from the stored signature in the session");
     }
 
-    mstime_t ttl = RedisModule_GetExpire(redisKey);
-
+    // Set the TTL for the signature key
+    RedisModule_SetExpire(redisKey, ttl * 1000);
     RedisModule_CloseKey(redisKey);
 
-    // Extract <payload_name> and validate it
-    size_t payloadNameLen;
-    const char *payloadName = RedisModule_StringPtrLen(argv[3], &payloadNameLen);
-    if (payloadNameLen == 0)
-        return RedisModule_ReplyWithError(ctx, "<payload_name> must have at least one character");
-    else if (payloadNameLen > PAYLOAD_NAME_MAX_STRLEN)
-    {
-        char msg[128];
-        sprintf(msg, "<payload_name> length exceeds the maximum value allowed of %zu", PAYLOAD_NAME_MAX_STRLEN);
-        return RedisModule_ReplyWithError(ctx, msg);
-    }
-
-    // Extract <payload_data> and validate it
-    size_t payloadDataLen;
-    const char *payloadData = RedisModule_StringPtrLen(argv[4], &payloadDataLen);
-    if (payloadDataLen == 0)
-        return RedisModule_ReplyWithError(ctx, "<payload_data> must have at least one character");
-    else if (payloadDataLen > PAYLOAD_DATA_MAX_STRLEN)
-    {
-        char msg[128];
-        sprintf(msg, "<payload_data> length exceeds the maximum value allowed of %zu", PAYLOAD_DATA_MAX_STRLEN);
-        return RedisModule_ReplyWithError(ctx, msg);
-    }
-
-    // Set the payload
+    // Set the TTL for the payloads key if it exists
     RedisModuleString *sessionPayloadsKeyStr = RedisModule_CreateStringPrintf(ctx, "sg-session:%s:payloads", sessionId);
     redisKey = RedisModule_OpenKey(ctx, sessionPayloadsKeyStr, REDISMODULE_WRITE);
-    RedisModule_HashSet(redisKey, REDISMODULE_HASH_NONE, argv[3], argv[4], NULL);
-
-    // Set the TTL
-    if (ttl > 0)
-        RedisModule_SetExpire(redisKey, ttl);
+    if (RedisModule_KeyType(redisKey) == REDISMODULE_KEYTYPE_HASH)
+        RedisModule_SetExpire(redisKey, ttl * 1000);
 
     RedisModule_CloseKey(redisKey);
 

@@ -9,7 +9,7 @@ import re as regex
 
 hmacSecret = 'testhmacpass'
 
-class TestCase(ModuleTestCase('../build/libsessiongate.so')):
+class TestCase(ModuleTestCase('../lib/sessiongate.so')):
     def testStart(self):
         with self.redis() as r:
             with self.assertRaises(ResponseError) as context:
@@ -38,10 +38,10 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
 
             # Sum of the length of each part of the token + 2 dots:
             # - 2 from token version
-            # - 32 from session ID
+            # - 16 from session ID
             # - 64 from token signature
             # - 2 dots to separate the token parts
-            self.assertTrue(len(r.execute_command('sessiongate.start', hmacSecret, 15)) == 2 + 32 + 64 + 2)
+            self.assertTrue(len(r.execute_command('sessiongate.start', hmacSecret, 15)) == 2 + 16 + 64 + 2)
 
     def testEnd(self):
         with self.redis() as r:
@@ -54,25 +54,26 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
             self.assertTrue("wrong number of arguments for 'sessiongate.end' command" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.end', hmacSecret, 'token')
-            self.assertTrue("the token format is invalid" in context.exception)
+                r.execute_command('sessiongate.end', '', 'token')
+            self.assertTrue("<sign_key> must have at least one character" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.end', hmacSecret, 'v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')
-            self.assertTrue("invalid token: the signatures do not match" in context.exception)
+                r.execute_command('sessiongate.end', hmacSecret, '')
+            self.assertTrue("<token> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.end', hmacSecret, 'token')
+            self.assertTrue("<token> format is invalid" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.end', hmacSecret, 'v1.' + ('a' * 16) + '.' + ('b' * 64))
+            self.assertTrue("the signature contained in <token> is invalid" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             r.execute_command('sessiongate.end', hmacSecret, token)
             with self.assertRaises(ResponseError) as context:
                 r.execute_command('sessiongate.end', hmacSecret, token)
-            self.assertTrue("the token is expired" in context.exception)
-
-            # Change the token version
-            token = r.execute_command('sessiongate.start', hmacSecret, 15)
-            token = regex.sub('^\w+', 'v0', token)
-            with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.end', hmacSecret, token)
-            self.assertTrue("invalid token: wrong token version" in context.exception)
+            self.assertTrue("the session id contained in <token> does not exist" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             self.assertOk(r.execute_command('sessiongate.end', hmacSecret, token))
@@ -90,27 +91,45 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
             self.assertTrue("wrong number of arguments for 'sessiongate.pset' command" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pset', hmacSecret, 'token', 'payload_name', 'payload_data')
-            self.assertTrue("the token format is invalid" in context.exception)
+                r.execute_command('sessiongate.pset', '', 'token', 'payload_name', 'payload_data')
+            self.assertTrue("<sign_key> must have at least one character" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pset', hmacSecret, 'v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'payload_name', 'payload_data')
-            self.assertTrue("invalid token: the signatures do not match" in context.exception)
+                r.execute_command('sessiongate.pset', hmacSecret, '', 'payload_name', 'payload_data')
+            self.assertTrue("<token> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pset', hmacSecret, 'token', 'payload_name', 'payload_data')
+            self.assertTrue("<token> format is invalid" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pset', hmacSecret, 'v1.' + ('a' * 16) + '.' + ('b' * 64), 'payload_name', 'payload_data')
+            self.assertTrue("the signature contained in <token> is invalid" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             r.execute_command('sessiongate.end', hmacSecret, token)
             with self.assertRaises(ResponseError) as context:
                 r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', 'payload_data')
-            self.assertTrue("the token is expired" in context.exception)
+            self.assertTrue("the session id contained in <token> does not exist" in context.exception)
 
-            # Change the token version
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
-            token = regex.sub('^\w+', 'v0', token)
+
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', 'payload_data')
-            self.assertTrue("invalid token: wrong token version" in context.exception)
+                r.execute_command('sessiongate.pset', hmacSecret, token, '', 'payload_data')
+            self.assertTrue("<payload_name> must have at least one character" in context.exception)
 
-            token = r.execute_command('sessiongate.start', hmacSecret, 15)
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pset', hmacSecret, token, 'a' * 201, 'payload_data')
+            self.assertTrue("<payload_name> length exceeds the maximum value allowed of 200" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', '')
+            self.assertTrue("<payload_data> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', 'a' * (int(1e6 * 8) + 1))
+            self.assertTrue("<payload_data> length exceeds the maximum value allowed of " + str(int(1e6 * 8)) in context.exception)
+
             self.assertOk(r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', 'payload_data'))
 
     def testPGet(self):
@@ -126,32 +145,41 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
             self.assertTrue("wrong number of arguments for 'sessiongate.pget' command" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pget', hmacSecret, 'token', 'payload_name')
-            self.assertTrue("the token format is invalid" in context.exception)
+                r.execute_command('sessiongate.pget', '', 'token', 'payload_name')
+            self.assertTrue("<sign_key> must have at least one character" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pget', hmacSecret, 'v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'payload_name')
-            self.assertTrue("invalid token: the signatures do not match" in context.exception)
+                r.execute_command('sessiongate.pget', hmacSecret, '', 'payload_name')
+            self.assertTrue("<token> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pget', hmacSecret, 'token', 'payload_name')
+            self.assertTrue("<token> format is invalid" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pget', hmacSecret, 'v1.' + ('a' * 16) + '.' + ('b' * 64), 'payload_name')
+            self.assertTrue("the signature contained in <token> is invalid" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             r.execute_command('sessiongate.end', hmacSecret, token)
             with self.assertRaises(ResponseError) as context:
                 r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name')
-            self.assertTrue("the token is expired" in context.exception)
+            self.assertTrue("the session id contained in <token> does not exist" in context.exception)
 
-            # Change the token version
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
-            token = regex.sub('^\w+', 'v0', token)
+
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name')
-            self.assertTrue("invalid token: wrong token version" in context.exception)
+                r.execute_command('sessiongate.pget', hmacSecret, token, '')
+            self.assertTrue("<payload_name> must have at least one character" in context.exception)
 
-            token = r.execute_command('sessiongate.start', hmacSecret, 15)
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name')
-            self.assertTrue("the requested payload does not exist" in context.exception)
+                r.execute_command('sessiongate.pget', hmacSecret, token, 'a' * 201)
+            self.assertTrue("<payload_name> length exceeds the maximum value allowed of 200" in context.exception)
 
-            token = r.execute_command('sessiongate.start', hmacSecret, 15)
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name_does_not_exist')
+            self.assertTrue("the requested <payload_name> does not exist" in context.exception)
+
             r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', 'payload_data')
             self.assertEqual(r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name'), 'payload_data')
 
@@ -186,30 +214,39 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
             self.assertTrue("wrong number of arguments for 'sessiongate.pdel' command" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pdel', hmacSecret, 'token', 'payload_name')
-            self.assertTrue("the token format is invalid" in context.exception)
+                r.execute_command('sessiongate.pdel', '', 'token', 'payload_name')
+            self.assertTrue("<sign_key> must have at least one character" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pdel', hmacSecret, 'v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'payload_name')
-            self.assertTrue("invalid token: the signatures do not match" in context.exception)
+                r.execute_command('sessiongate.pdel', hmacSecret, '', 'payload_name')
+            self.assertTrue("<token> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pdel', hmacSecret, 'token', 'payload_name')
+            self.assertTrue("<token> format is invalid" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pdel', hmacSecret, 'v1.' + ('a' * 16) + '.' + ('b' * 64), 'payload_name')
+            self.assertTrue("the signature contained in <token> is invalid" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             r.execute_command('sessiongate.end', hmacSecret, token)
             with self.assertRaises(ResponseError) as context:
                 r.execute_command('sessiongate.pdel', hmacSecret, token, 'payload_name')
-            self.assertTrue("the token is expired" in context.exception)
-
-            # Change the token version
-            token = r.execute_command('sessiongate.start', hmacSecret, 15)
-            token = regex.sub('^\w+', 'v0', token)
-            with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pdel', hmacSecret, token, 'payload_name')
-            self.assertTrue("invalid token: wrong token version" in context.exception)
+            self.assertTrue("the session id contained in <token> does not exist" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.pdel', hmacSecret, token, 'payload_name')
-            self.assertTrue("the requested payload to delete does not exist" in context.exception)
+                r.execute_command('sessiongate.pdel', hmacSecret, token, '')
+            self.assertTrue("<payload_name> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pdel', hmacSecret, token, 'a' * 201)
+            self.assertTrue("<payload_name> length exceeds the maximum value allowed of 200" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.pdel', hmacSecret, token, 'payload_name_does_not_exist')
+            self.assertTrue("the requested <payload_name> does not exist" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             r.execute_command('sessiongate.pset', hmacSecret, token, 'payload_name', 'payload_data')
@@ -232,7 +269,7 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
             self.assertEqual(r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name3'), 'payload_data3')
             with self.assertRaises(ResponseError) as context:
                 r.execute_command('sessiongate.pget', hmacSecret, token, 'payload_name2')
-            self.assertTrue("the requested payload does not exist" in context.exception)
+            self.assertTrue("the requested <payload_name> does not exist" in context.exception)
 
     def testExpire(self):
         with self.redis() as r:
@@ -247,25 +284,39 @@ class TestCase(ModuleTestCase('../build/libsessiongate.so')):
             self.assertTrue("wrong number of arguments for 'sessiongate.expire' command" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.expire', hmacSecret, 'token', 500)
-            self.assertTrue("the token format is invalid" in context.exception)
+                r.execute_command('sessiongate.expire', '', 'token', 500)
+            self.assertTrue("<sign_key> must have at least one character" in context.exception)
 
             with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.expire', hmacSecret, 'v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 500)
-            self.assertTrue("invalid token: the signatures do not match" in context.exception)
+                r.execute_command('sessiongate.expire', hmacSecret, '', 500)
+            self.assertTrue("<token> must have at least one character" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.expire', hmacSecret, 'token', 500)
+            self.assertTrue("<token> format is invalid" in context.exception)
+
+            token = r.execute_command('sessiongate.start', hmacSecret, 15)
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.expire', hmacSecret, token, '')
+            self.assertTrue("<ttl> must be a valid integer that represents seconds" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.expire', hmacSecret, token, 'asd')
+            self.assertTrue("<ttl> must be a valid integer that represents seconds" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.expire', hmacSecret, token, '-1')
+            self.assertTrue("<ttl> must be a valid integer that represents seconds" in context.exception)
+
+            with self.assertRaises(ResponseError) as context:
+                r.execute_command('sessiongate.expire', hmacSecret, 'v1.' + ('a' * 16) + '.' + ('b' * 64), 500)
+            self.assertTrue("the signature contained in <token> is invalid" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             r.execute_command('sessiongate.end', hmacSecret, token)
             with self.assertRaises(ResponseError) as context:
                 r.execute_command('sessiongate.expire', hmacSecret, token, 500)
-            self.assertTrue("the token is expired" in context.exception)
-
-            # Change the token version
-            token = r.execute_command('sessiongate.start', hmacSecret, 15)
-            token = regex.sub('^\w+', 'v0', token)
-            with self.assertRaises(ResponseError) as context:
-                r.execute_command('sessiongate.expire', hmacSecret, token, 500)
-            self.assertTrue("invalid token: wrong token version" in context.exception)
+            self.assertTrue("the session id contained in <token> does not exist" in context.exception)
 
             token = r.execute_command('sessiongate.start', hmacSecret, 15)
             self.assertOk(r.execute_command('sessiongate.expire', hmacSecret, token, 500))

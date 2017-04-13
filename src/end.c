@@ -18,7 +18,7 @@ int EndCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
     if (tokenLen == 0)
         return RedisModule_ReplyWithError(ctx, "<token> must have at least one character");
     else if (tokenLen != TOKEN_STRLEN)
-        return RedisModule_ReplyWithError(ctx, "<token> length is invalid");
+        return RedisModule_ReplyWithError(ctx, "<token> format is invalid");
 
     // Parse the token
     char tokenVersion[TOKEN_VERSION_STRLEN + 1];

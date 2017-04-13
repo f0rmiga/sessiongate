@@ -18,7 +18,7 @@ int PGetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
     if (tokenLen == 0)
         return RedisModule_ReplyWithError(ctx, "<token> must have at least one character");
     else if (tokenLen != TOKEN_STRLEN)
-        return RedisModule_ReplyWithError(ctx, "<token> length is invalid");
+        return RedisModule_ReplyWithError(ctx, "<token> format is invalid");
 
     // Parse the token
     char tokenVersion[TOKEN_VERSION_STRLEN + 1];
@@ -50,11 +50,33 @@ int PGetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
 
     RedisModule_CloseKey(redisKey);
 
+    // Extract <payload_name> and validate it
+    size_t payloadNameLen;
+    const char *payloadName = RedisModule_StringPtrLen(argv[3], &payloadNameLen);
+    if (payloadNameLen == 0)
+        return RedisModule_ReplyWithError(ctx, "<payload_name> must have at least one character");
+    else if (payloadNameLen > PAYLOAD_NAME_MAX_STRLEN)
+    {
+        char msg[128];
+        sprintf(msg, "<payload_name> length exceeds the maximum value allowed of %zu", PAYLOAD_NAME_MAX_STRLEN);
+        return RedisModule_ReplyWithError(ctx, msg);
+    }
+
     // Get the payload
     RedisModuleString *sessionPayloadsKeyStr = RedisModule_CreateStringPrintf(ctx, "sg-session:%s:payloads", sessionId);
     redisKey = RedisModule_OpenKey(ctx, sessionPayloadsKeyStr, REDISMODULE_READ);
+    if (RedisModule_KeyType(redisKey) != REDISMODULE_KEYTYPE_HASH)
+    {
+        RedisModule_CloseKey(redisKey);
+        return RedisModule_ReplyWithError(ctx, "the requested <payload_name> does not exist");
+    }
     RedisModuleString *payloadData;
     RedisModule_HashGet(redisKey, REDISMODULE_HASH_NONE, argv[3], &payloadData, NULL);
+    if (payloadData == NULL)
+    {
+        RedisModule_CloseKey(redisKey);
+        return RedisModule_ReplyWithError(ctx, "the requested <payload_name> does not exist");
+    }
     RedisModule_CloseKey(redisKey);
 
     RedisModule_ReplyWithString(ctx, payloadData);

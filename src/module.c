@@ -2,8 +2,10 @@
 #include "rmutil/util.h"
 
 #include "end.h"
-#include "pset.h"
+#include "expire.h"
+#include "pdel.h"
 #include "pget.h"
+#include "pset.h"
 #include "start.h"
 #include "utils.h"
 
@@ -22,8 +24,8 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
     RMUtil_RegisterWriteCmd(ctx, "sessiongate.end", EndCommand, "write");
     RMUtil_RegisterWriteCmd(ctx, "sessiongate.pset", PSetCommand, "write");
     RMUtil_RegisterWriteCmd(ctx, "sessiongate.pget", PGetCommand, "readonly");
-    // RMUtil_RegisterWriteCmd(ctx, "sessiongate.pdel", PDelCommand, "write");
-    // RMUtil_RegisterWriteCmd(ctx, "sessiongate.expire", ExpireCommand, "write");
+    RMUtil_RegisterWriteCmd(ctx, "sessiongate.pdel", PDelCommand, "write");
+    RMUtil_RegisterWriteCmd(ctx, "sessiongate.expire", ExpireCommand, "write");
 
     return REDISMODULE_OK;
 }

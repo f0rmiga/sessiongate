@@ -1,6 +1,6 @@
 # Session Gate
 
-Session Gate is a Redis module to ease session management using tokens.
+Session Gate is a Redis module to ease session management using tokens. This module does NOT do user management, don't get confused. In the real world, most of the sessions are related to a user but do you crazy logic to manage the users the way you want.
 
 ## How it works
 
@@ -14,14 +14,10 @@ To know more about Redis modules, follow this [link](http://antirez.com/news/106
 
 ## How to build
 
-The module is written in C++ and uses Cmake. The script `run_build.sh` is a convenient script that does all the work under the `build/` directory if you have all dependencies installed. There is another convenient script called `run_docker_linux_build.sh` that spins off a new Docker container and do all the work under `docker/compile-linux/ubuntu-16.10` directory.
+The module is written in C and uses Cmake. The scripts `bootstrap.sh` and `build.sh` are convenient scripts that do all the work under the `build/` directory if you have all dependencies installed.
 
 The dependencies are:
-- [Crypto++](https://cryptopp.com/) 5.6.3+
-- [Boost String](http://www.boost.org/doc/libs/1_63_0/doc/html/string_algo.html)
-
-If you are running Linux, most package managers do not provide the required version of Crypto++. You might want to run the Docker build process or compile the latest version of the library by yourself.
-If you are running OS X, [Homebrew](http://brewformulas.org/Cryptopp) got you covered.
+- [The Sodium crypto library (libsodium)](https://download.libsodium.org/doc/)
 
 ## How to run tests
 
@@ -29,17 +25,27 @@ Tests are located under `tests/` directory and are written in Python. The script
 
 - Install Python 2.7+
 - Install [rmtest package](https://github.com/RedisLabs/rmtest) by running `pip install rmtest`
-- Run it: `sh run_tests.sh`
+
+Then run it:
+```
+$ cd tests/
+$ python all.py
+```
 
 ## Loading the module for use
 
 The module can be loaded in Redis 4+. The most convenient way to do that is by passing --loadmodule parameter when starting the Redis server:
 
 ```
-$ redis-server --loadmodule <path_to_libsessiongate.so>
+$ redis-server --loadmodule <path_to_sessiongate.so>
 ```
 
-Just make sure to pass the right `libsessiongate.so` path value to the --loadmodule parameter.
+For example, starting Redis open to the world and the Session Gate loaded:
+```
+$ redis-server --protected-mode no --loadmodule $(pwd)/lib/sessiongate.so
+```
+
+Just make sure to pass the right `sessiongate.so` path value to the --loadmodule parameter.
 
 ## Commands
 
@@ -48,7 +54,7 @@ Just make sure to pass the right `libsessiongate.so` path value to the --loadmod
 Command: `SESSIONGATE.START <sign_key> <ttl>`
 
 - `<sign_key>` is the secret string used by the HMAC algorithm to generate the token signature.
-- `<ttl>` is the positive integer that represents the seconds that the session will live. If set to 0, the session is non-expiable.
+- `<ttl>` is the positive integer that represents the seconds that the session will live. If set to 0, the session expires immediately.
 
 ##### Example
 ```
@@ -63,7 +69,7 @@ Command: `SESSIONGATE.EXPIRE <sign_key> <token> <ttl>`
 
 - `<sign_key>` is the secret string used by the HMAC algorithm to verify the token signature.
 - `<token>` is the token returned by the START command.
-- `<ttl>` is the positive integer that represents the seconds that the session will live. If set to 0, the session becomes non-expiable.
+- `<ttl>` is the positive integer that represents the seconds that the session will live. If set to 0, the session expires immediately.
 
 ##### Example
 ```

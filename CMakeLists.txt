@@ -43,6 +43,8 @@ add_library(sessiongate SHARED
   src/end.c
   src/pset.c
   src/pget.c
+  src/pdel.c
+  src/expire.c
   ${RMUTIL_DIR}/util.c)
 set_target_properties(sessiongate PROPERTIES PREFIX "" C_VISIBILITY_PRESET hidden LINK_FLAGS "-Bsymbolic")
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")

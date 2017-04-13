@@ -1,8 +1,8 @@
 #include "pset.h"
 
-int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
+int PDelCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
 {
-    if (argc != 5)
+    if (argc != 4)
         return RedisModule_WrongArity(ctx);
     RedisModule_AutoMemory(ctx);
 
@@ -48,8 +48,6 @@ int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
         return RedisModule_ReplyWithError(ctx, "the signature contained in <token> seems to be valid, but is different from the stored signature in the session");
     }
 
-    mstime_t ttl = RedisModule_GetExpire(redisKey);
-
     RedisModule_CloseKey(redisKey);
 
     // Extract <payload_name> and validate it
@@ -64,27 +62,15 @@ int PSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
         return RedisModule_ReplyWithError(ctx, msg);
     }
 
-    // Extract <payload_data> and validate it
-    size_t payloadDataLen;
-    const char *payloadData = RedisModule_StringPtrLen(argv[4], &payloadDataLen);
-    if (payloadDataLen == 0)
-        return RedisModule_ReplyWithError(ctx, "<payload_data> must have at least one character");
-    else if (payloadDataLen > PAYLOAD_DATA_MAX_STRLEN)
-    {
-        char msg[128];
-        sprintf(msg, "<payload_data> length exceeds the maximum value allowed of %zu", PAYLOAD_DATA_MAX_STRLEN);
-        return RedisModule_ReplyWithError(ctx, msg);
-    }
-
-    // Set the payload
+    // Delete the payload
     RedisModuleString *sessionPayloadsKeyStr = RedisModule_CreateStringPrintf(ctx, "sg-session:%s:payloads", sessionId);
     redisKey = RedisModule_OpenKey(ctx, sessionPayloadsKeyStr, REDISMODULE_WRITE);
-    RedisModule_HashSet(redisKey, REDISMODULE_HASH_NONE, argv[3], argv[4], NULL);
-
-    // Set the TTL
-    if (ttl > 0)
-        RedisModule_SetExpire(redisKey, ttl);
-
+    if (RedisModule_KeyType(redisKey) != REDISMODULE_KEYTYPE_HASH)
+    {
+        RedisModule_CloseKey(redisKey);
+        return RedisModule_ReplyWithError(ctx, "the requested <payload_name> does not exist");
+    }
+    RedisModule_HashSet(redisKey, REDISMODULE_HASH_NONE, argv[3], REDISMODULE_HASH_DELETE, NULL);
     RedisModule_CloseKey(redisKey);
 
     RedisModule_ReplyWithSimpleString(ctx, "OK");
