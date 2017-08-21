@@ -21,7 +21,7 @@ The dependencies are:
 
 ## How to run tests
 
-Tests are located under `tests/` directory and are written in Python. The script `run_tests.sh` runs them.
+Tests are located under `tests/` directory and are written in Python.
 
 - Install Python 2.7
 - Install [rmtest package](https://github.com/RedisLabs/rmtest) by running `pip install rmtest`
