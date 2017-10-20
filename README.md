@@ -137,3 +137,11 @@ SESSIONGATE.END 'qwerty' <token>
 ```
 
 Returns: OK.
+
+## Specific language drivers
+
+Here is a list of drivers implemented in specific languages to ease the use of the SessionGate module:
+
+### Go
+
+https://github.com/f0rmiga/sessiongate-go
