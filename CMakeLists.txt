@@ -47,9 +47,7 @@ add_library(sessiongate SHARED
   src/expire.c
   ${RMUTIL_DIR}/util.c)
 set_target_properties(sessiongate PROPERTIES PREFIX "" C_VISIBILITY_PRESET hidden LINK_FLAGS "-Bsymbolic")
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-  set_target_properties(sessiongate PROPERTIES COMPILE_FLAGS "-fPIC")
-endif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+set_target_properties(sessiongate PROPERTIES COMPILE_FLAGS "-fPIC")
 target_compile_definitions(sessiongate PUBLIC REDIS_MODULE_TARGET)
 
 if(NOT DEFINED LIBSODIUM_LIB_DIR)
