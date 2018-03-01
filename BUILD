@@ -4,35 +4,35 @@ cc_library(
     name = "sessiongate",
     srcs = glob(["src/*.c"]),
     hdrs = glob(["src/*.h"]),
+    copts = ["-std=c11"],
     deps = [
         "@libsodium//:sodium",
         "@redis_modules_sdk//:redis_modules_sdk",
     ],
-    copts = ["-std=c11"],
     alwayslink = 1,
 )
 
 cc_binary(
     name = "sessiongate.so",
+    linkshared = 1,
     deps = [
         ":sessiongate",
     ],
-    linkshared = 1,
 )
 
 load("@test_deps//:requirements.bzl", "requirement")
 
 py_test(
     name = "sessiongate_test",
+    size = "small",
     srcs = [
         "tests/all.py",
     ],
-    main = "tests/all.py",
     data = [
         ":sessiongate.so",
     ],
+    main = "tests/all.py",
     deps = [
         requirement("rmtest"),
     ],
-    size = "small",
 )
