@@ -44,15 +44,17 @@ $ bazel build //...
 
 ## How to run tests
 
-Tests are located under `tests/` directory and are written in Python.
+Tests are located under `tests/` directory and are written in Python. You should have Python 2.7+
+installed in order to run the tests. Run:
 
-- Install Python 2.7
-- Install [rmtest package](https://github.com/RedisLabs/rmtest) by running `pip install rmtest`
-
-Then run it:
 ```
-$ cd tests/
-$ python all.py
+$ bazel test //...
+```
+
+For verbose tests run:
+
+```
+$ bazel test --test_output=all //...
 ```
 
 ## Loading the module for use
