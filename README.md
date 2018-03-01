@@ -1,3 +1,7 @@
+[
+![Build Status](https://travis-ci.org/f0rmiga/sessiongate.svg?branch=master)
+](https://travis-ci.org/f0rmiga/sessiongate)
+
 # Session Gate
 
 Session Gate is a Redis module to ease session management using tokens. This module does NOT do user
