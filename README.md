@@ -27,6 +27,7 @@ To know more about Redis modules, follow this [link](http://antirez.com/news/106
 The module is written in C and uses Bazel to build. Bazel manages all the dependencies. :D
 
 The dependencies are:
+
 - [Redis Modules SDK](https://github.com/RedisLabs/RedisModulesSDK)
 - [Sodium crypto library (libsodium)](https://download.libsodium.org/doc/)
 
@@ -34,8 +35,8 @@ The dependencies are:
 
 Run:
 
-```
-$ bazel build //...
+```txt
+bazel build //...
 ```
 
 ### Building on Windows
@@ -47,14 +48,14 @@ $ bazel build //...
 Tests are located under `tests/` directory and are written in Python. You should have Python 2.7+
 installed in order to run the tests. Run:
 
-```
-$ bazel test //...
+```txt
+bazel test //...
 ```
 
 For verbose tests run:
 
-```
-$ bazel test --test_output=all //...
+```txt
+bazel test --test_output=all //...
 ```
 
 ## Loading the module for use
@@ -62,13 +63,14 @@ $ bazel test --test_output=all //...
 The module can be loaded in Redis 4+. The most convenient way to do that is by passing --loadmodule
 parameter when starting the Redis server:
 
-```
-$ redis-server --loadmodule <path_to_sessiongate.so>
+```txt
+redis-server --loadmodule <path_to_sessiongate.so>
 ```
 
 For example, starting Redis open to the world and the Session Gate loaded:
-```
-$ redis-server --protected-mode no --loadmodule $(pwd)/bazel-bin/sessiongate.so
+
+```txt
+redis-server --protected-mode no --loadmodule $(pwd)/bazel-bin/sessiongate.so
 ```
 
 Just make sure to pass the right `sessiongate.so` path value to the --loadmodule parameter.
@@ -81,10 +83,11 @@ Command: `SESSIONGATE.START <sign_key> <ttl>`
 
 - `<sign_key>` is the secret string used by the HMAC algorithm to generate the token signature.
 - `<ttl>` is the positive integer that represents the seconds that the session will live. If set to
-0, the session expires immediately.
+  0, the session expires immediately.
 
-##### Example
-```
+#### Example
+
+```txt
 SESSIONGATE.START 'qwerty' 300
 ```
 
@@ -97,10 +100,11 @@ Command: `SESSIONGATE.EXPIRE <sign_key> <token> <ttl>`
 - `<sign_key>` is the secret string used by the HMAC algorithm to verify the token signature.
 - `<token>` is the token returned by the START command.
 - `<ttl>` is the positive integer that represents the seconds that the session will live. If set to
-0, the session expires immediately.
+  0, the session expires immediately.
 
-##### Example
-```
+#### Example
+
+```txt
 SESSIONGATE.EXPIRE 'qwerty' <token> 300
 ```
 
@@ -114,10 +118,11 @@ Command: `SESSIONGATE.PSET <sign_key> <token> <payload_name> <payload_data>`
 - `<token>` is the token returned by the START command.
 - `<payload_name>` is the payload name that is used to identify the payload data.
 - `<payload_data>` is the payload data. It can be any string, for example, a JSON stringified
-object.
+  object.
 
-##### Example
-```
+#### Example
+
+```txt
 SESSIONGATE.PSET 'qwerty' <token> 'user' '{"name":"John Doe"}'
 ```
 
@@ -131,8 +136,9 @@ Command: `SESSIONGATE.PGET <sign_key> <token> <payload_name>`
 - `<token>` is the token returned by the START command.
 - `<payload_name>` is the payload name that is used to retrieve the payload data.
 
-##### Example
-```
+#### Example
+
+```txt
 SESSIONGATE.PGET 'qwerty' <token> 'user'
 ```
 
@@ -146,8 +152,9 @@ Command: `SESSIONGATE.PDEL <sign_key> <token> <payload_name>`
 - `<token>` is the token returned by the START command.
 - `<payload_name>` is the payload name that is used to identify the payload data being deleted.
 
-##### Example
-```
+#### Example
+
+```txt
 SESSIONGATE.PDEL 'qwerty' <token> 'user'
 ```
 
@@ -160,8 +167,9 @@ Command: `SESSIONGATE.END <sign_key> <token>`
 - `<sign_key>` is the secret string used by the HMAC algorithm to verify the token signature.
 - `<token>` is the token returned by the START command.
 
-##### Example
-```
+#### Example
+
+```txt
 SESSIONGATE.END 'qwerty' <token>
 ```
 
