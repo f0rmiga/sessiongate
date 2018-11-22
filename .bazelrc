@@ -1,0 +1,10 @@
+startup \
+  --host_jvm_args=-Xmx2g \
+  --host_jvm_args=-Xms1024m \
+
+build \
+  --local_resources=2048,2.0,1.0
+
+test \
+  --test_output=errors \
+  --test_verbose_timeout_warnings

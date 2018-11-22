@@ -15,20 +15,27 @@ compiler:
   - clang
   - gcc
 
+env:
+  global:
+    - BAZEL_VERSION="0.19.2"
+  matrix:
+    - REDIS_VERSION="4.0.11"
+    - REDIS_VERSION="5.0.1"
+
 before_install:
   # Install Bazel.
-  - wget https://github.com/bazelbuild/bazel/releases/download/0.11.0/bazel_0.11.0-linux-x86_64.deb
-  - sudo dpkg -i bazel_0.11.0-linux-x86_64.deb
+  - wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb
+  - sudo dpkg -i bazel_${BAZEL_VERSION}-linux-x86_64.deb
 
   # Compile and install Redis.
-  - wget https://github.com/antirez/redis/archive/4.0.8.tar.gz
-  - tar zxf 4.0.8.tar.gz
-  - cd redis-4.0.8
+  - wget https://github.com/antirez/redis/archive/${REDIS_VERSION}.tar.gz
+  - tar zxf ${REDIS_VERSION}.tar.gz
+  - cd redis-${REDIS_VERSION}
   - make -j4
   - sudo make install
   - cd ..
 
 script:
-  # Run the test.
+  # Run the tests.
   - bazel build //...
   - bazel test --test_output=all //...
