@@ -32,10 +32,15 @@ new_git_repository(
     remote = "https://github.com/RedisLabs/RedisModulesSDK.git",
 )
 
+libsodium_version = "1.0.16"
 new_http_archive(
     name = "libsodium",
     build_file = "libsodium.BUILD",
     sha256 = "eeadc7e1e1bcef09680fb4837d448fbdf57224978f865ac1c16745868fbd0533",
-    strip_prefix = "libsodium-1.0.16",
-    urls = ["https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz"],
+    strip_prefix = "libsodium-{}".format(libsodium_version),
+    urls = [
+        "https://github.com/jedisct1/libsodium/releases/download/{v}/libsodium-{v}.tar.gz".format(
+            v = libsodium_version,
+        ),
+    ],
 )

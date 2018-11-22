@@ -8,7 +8,7 @@ genrule(
     cmd = """
 cat > $@ <<"EOF"
 #! /bin/sh
-./external/libsodium/configure
+./external/libsodium/configure >> /dev/null
 EOF"""
 )
 
