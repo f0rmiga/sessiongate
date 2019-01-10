@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  "redis 4":
+    working_directory: ~/sessiongate
+    docker:
+    - image: thulioassis/sessiongate-ci:latest
+    steps:
+    - checkout:
+        path: ~/sessiongate
+    - run:
+        command: /opt/bin/install_redis.sh 4.0.12
+    - run:
+        command: bazel test //...
+  "redis 5":
+    working_directory: ~/sessiongate
+    docker:
+    - image: thulioassis/sessiongate-ci:latest
+    steps:
+    - checkout:
+        path: ~/sessiongate
+    - run:
+        command: /opt/bin/install_redis.sh 5.0.3
+    - run:
+        command: bazel test //...
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+    - redis 4
+    - redis 5
