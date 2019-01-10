@@ -15,4 +15,6 @@ RUN zypper install -y \
 
 ADD install_bazel.sh /opt/bin/install_bazel.sh
 ADD install_redis.sh /opt/bin/install_redis.sh
-RUN /opt/bin/install_bazel.sh 0.19.2
+
+ADD bazel_version /var/bazel_install/bazel_version
+RUN cat /var/bazel_install/bazel_version | xargs /opt/bin/install_bazel.sh

@@ -4,7 +4,7 @@ set -o errexit
 
 version="$1"
 
-printf "Downloading Bazel..."
+printf "Downloading Bazel ${version}..."
 tmp_installer=$(mktemp -t bazel.XXXXXXXX)
 curl \
   -o $tmp_installer \
@@ -12,6 +12,6 @@ curl \
   2> /dev/null
 printf " ok\n"
 
-printf "Installing Bazel..."
+printf "Installing Bazel ${version}..."
 sh $tmp_installer > /dev/null 2>&1
 printf " ok\n"
