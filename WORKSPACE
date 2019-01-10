@@ -1,5 +1,8 @@
 workspace(name = "sessiongate")
 
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 # Python rules.
 git_repository(
     name = "io_bazel_rules_python",
@@ -27,16 +30,16 @@ pip_install()
 # C dependencies.
 new_git_repository(
     name = "redis_modules_sdk",
-    build_file = "redis_modules_sdk.BUILD",
+    build_file = "//:redis_modules_sdk.BUILD",
     commit = "3e4daab6dcbc881d8c17406235d156de55be4fc7",
     remote = "https://github.com/RedisLabs/RedisModulesSDK.git",
 )
 
-libsodium_version = "1.0.16"
-new_http_archive(
+libsodium_version = "1.0.17"
+http_archive(
     name = "libsodium",
-    build_file = "libsodium.BUILD",
-    sha256 = "eeadc7e1e1bcef09680fb4837d448fbdf57224978f865ac1c16745868fbd0533",
+    build_file = "//:libsodium.BUILD",
+    sha256 = "0cc3dae33e642cc187b5ceb467e0ad0e1b51dcba577de1190e9ffa17766ac2b1",
     strip_prefix = "libsodium-{}".format(libsodium_version),
     urls = [
         "https://github.com/jedisct1/libsodium/releases/download/{v}/libsodium-{v}.tar.gz".format(
