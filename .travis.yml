@@ -19,8 +19,8 @@ env:
   global:
     - BAZEL_VERSION="0.19.2"
   matrix:
-    - REDIS_VERSION="4.0.11"
-    - REDIS_VERSION="5.0.1"
+    - REDIS_VERSION="4.0.12"
+    - REDIS_VERSION="5.0.3"
 
 before_install:
   # Install Bazel.
