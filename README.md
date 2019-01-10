@@ -1,6 +1,4 @@
-[
-![Build Status](https://travis-ci.org/f0rmiga/sessiongate.svg?branch=master)
-](https://travis-ci.org/f0rmiga/sessiongate)
+[![CircleCI](https://circleci.com/gh/f0rmiga/sessiongate/tree/master.svg?style=svg)](https://circleci.com/gh/f0rmiga/sessiongate/tree/master)
 
 # Session Gate
 
