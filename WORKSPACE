@@ -47,3 +47,26 @@ http_archive(
         ),
     ],
 )
+
+# Docker rules.
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = "c0e9d27e6ca307e4ac0122d3dd1df001b9824373fb6fb8627cd2371068e51fef",
+    strip_prefix = "rules_docker-0.6.0",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.6.0.tar.gz"],
+)
+
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+    container_repositories = "repositories",
+)
+
+container_repositories()
+
+container_pull(
+    name = "redis",
+    registry = "index.docker.io",
+    repository = "library/redis",
+    digest = "sha256:64cf18f3875e2a0a63e423fcfb1e082734691f404cd59f1f421575f42f48c595", # 5.0.3-stretch
+)
