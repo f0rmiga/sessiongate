@@ -34,12 +34,22 @@ The dependencies are:
 Run:
 
 ```txt
-bazel build //...
+bazel build //:sessiongate.so
 ```
 
 ### Building on Windows
 
 ¯\\\_(ツ)\_/¯
+
+### Building the Docker image
+
+On Linux, Docker is necessary only if you want to load the built image into the daemon (which is
+almost always the case). On OS X and Windows, Docker is always required to be installed.
+
+On Linux, simply run `bazel run //:sessiongate_image`. It will build and load the image.
+
+On OS X and Windows, run the script `./build_and_load_image_with_docker.sh`, which uses Docker in
+Docker for building the module and appending it as a layer on top of the Redis image.
 
 ## How to run tests
 
