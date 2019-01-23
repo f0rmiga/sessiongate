@@ -8,7 +8,7 @@ jobs:
     - checkout:
         path: ~/sessiongate
     - run:
-        command: /opt/bin/install_redis.sh 4.0.12
+        command: cat /var/versions/redis_4 | xargs /opt/bin/install_redis.sh
     - run:
         command: bazel test --test_output=all //...
   "redis 5":
@@ -19,7 +19,7 @@ jobs:
     - checkout:
         path: ~/sessiongate
     - run:
-        command: /opt/bin/install_redis.sh 5.0.3
+        command: cat /var/versions/redis_5 | xargs /opt/bin/install_redis.sh
     - run:
         command: bazel test --test_output=all //...
 workflows:
