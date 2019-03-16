@@ -10,8 +10,26 @@ load("@test_deps//:requirements.bzl", "requirement")
 
 cc_library(
     name = "sessiongate",
-    srcs = glob(["src/*.c"]),
-    hdrs = glob(["src/*.h"]),
+    srcs = [
+        "src/end.c",
+        "src/expire.c",
+        "src/module.c",
+        "src/pdel.c",
+        "src/pget.c",
+        "src/pset.c",
+        "src/start.c",
+        "src/utils.c",
+    ],
+    hdrs = [
+        "src/consts.h",
+        "src/end.h",
+        "src/expire.h",
+        "src/pdel.h",
+        "src/pget.h",
+        "src/pset.h",
+        "src/start.h",
+        "src/utils.h",
+    ],
     copts = ["-std=c11"],
     deps = [
         "@libsodium//:sodium",
