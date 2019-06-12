@@ -6,7 +6,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 # Python rules.
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "115e3a0dab4291184fdcb0d4e564a0328364571a",
+    commit = "fdbb17a4118a1728d19e638a5291b4c4266ea5b8",
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
