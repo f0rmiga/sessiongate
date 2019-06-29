@@ -13,5 +13,6 @@ zypper install -y \
   libstdc++-devel \
   python \
   python-pip \
+  python3 \
   unzip \
   which

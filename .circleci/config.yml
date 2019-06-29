@@ -3,7 +3,7 @@ jobs:
   "redis 4":
     working_directory: ~/sessiongate
     docker:
-    - image: thulioassis/sessiongate-ci:latest
+    - image: thulioassis/sessiongate-ci:0.1.0
     steps:
     - checkout:
         path: ~/sessiongate
@@ -14,7 +14,7 @@ jobs:
   "redis 5":
     working_directory: ~/sessiongate
     docker:
-    - image: thulioassis/sessiongate-ci:latest
+    - image: thulioassis/sessiongate-ci:0.1.0
     steps:
     - checkout:
         path: ~/sessiongate
