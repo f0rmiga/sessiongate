@@ -1,12 +1,17 @@
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//visibility:public"])
 
+load("@bazel_gazelle//:def.bzl", "gazelle")
 load(
     "@io_bazel_rules_docker//container:container.bzl",
     "container_bundle",
     "container_image",
     "container_push",
 )
-load("@test_deps//:requirements.bzl", "requirement")
+
+gazelle(
+    name = "gazelle",
+    prefix = "github.com/f0rmiga/sessiongate",
+)
 
 cc_library(
     name = "sessiongate",
@@ -52,7 +57,8 @@ container_image(
     files = [":sessiongate.so"],
     cmd = [
         "redis-server",
-        "--loadmodule", "/sessiongate.so",
+        "--loadmodule",
+        "/sessiongate.so",
     ],
 )
 
@@ -70,19 +76,4 @@ container_push(
     registry = "index.docker.io",
     repository = "thulioassis/sessiongate",
     tag = "latest",
-)
-
-py_test(
-    name = "sessiongate_test",
-    size = "small",
-    srcs = [
-        "tests/all.py",
-    ],
-    data = [
-        ":sessiongate.so",
-    ],
-    main = "tests/all.py",
-    deps = [
-        requirement("rmtest"),
-    ],
 )

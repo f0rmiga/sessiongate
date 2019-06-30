@@ -9,31 +9,6 @@ http_archive(
     urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/0.8.0/bazel-skylib.0.8.0.tar.gz"],
 )
 
-# Python rules.
-http_archive(
-    name = "io_bazel_rules_python",
-    sha256 = "9a3d71e348da504a9c4c5e8abd4cb822f7afb32c613dc6ee8b8535333a81a938",
-    strip_prefix = "rules_python-fdbb17a4118a1728d19e638a5291b4c4266ea5b8",
-    url = "https://github.com/bazelbuild/rules_python/archive/fdbb17a4118a1728d19e638a5291b4c4266ea5b8.tar.gz",
-)
-
-load(
-    "@io_bazel_rules_python//python:pip.bzl",
-    "pip_repositories",
-    "pip_import",
-)
-
-pip_repositories()
-
-pip_import(
-    name = "test_deps",
-    requirements = "//:pip_requirements.txt",
-)
-
-load("@test_deps//:requirements.bzl", "pip_install")
-
-pip_install()
-
 # C dependencies.
 new_git_repository(
     name = "redis_modules_sdk",
@@ -83,4 +58,108 @@ container_pull(
     repository = "library/redis",
     tag = "5.0.5-stretch",
     digest = "sha256:adcf62f378efe1187d2f72c6f0ecdf86ab2173a9e1c3c9f4fe4bb89060f5362f",
+)
+
+# Go rules.
+http_archive(
+    name = "io_bazel_rules_go",
+    urls = [
+        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+    ],
+    sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
+)
+
+http_archive(
+    name = "bazel_gazelle",
+    urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/0.17.0/bazel-gazelle-0.17.0.tar.gz"],
+    sha256 = "3c681998538231a2d24d0c07ed5a7658cb72bfb5fd4bf9911157c0e9ac6a2687",
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchains")
+
+go_rules_dependencies()
+
+go_register_toolchains()
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+
+gazelle_dependencies()
+
+go_repository(
+    name = "com_github_fsnotify_fsnotify",
+    importpath = "github.com/fsnotify/fsnotify",
+    tag = "v1.4.7",
+)
+
+go_repository(
+    name = "com_github_golang_protobuf",
+    importpath = "github.com/golang/protobuf",
+    tag = "v1.2.0",
+)
+
+go_repository(
+    name = "com_github_hpcloud_tail",
+    importpath = "github.com/hpcloud/tail",
+    tag = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_onsi_ginkgo",
+    importpath = "github.com/onsi/ginkgo",
+    tag = "v1.8.0",
+)
+
+go_repository(
+    name = "com_github_onsi_gomega",
+    importpath = "github.com/onsi/gomega",
+    tag = "v1.5.0",
+)
+
+go_repository(
+    name = "in_gopkg_check_v1",
+    commit = "20d25e280405",
+    importpath = "gopkg.in/check.v1",
+)
+
+go_repository(
+    name = "in_gopkg_fsnotify_v1",
+    importpath = "gopkg.in/fsnotify.v1",
+    tag = "v1.4.7",
+)
+
+go_repository(
+    name = "in_gopkg_tomb_v1",
+    commit = "dd632973f1e7",
+    importpath = "gopkg.in/tomb.v1",
+)
+
+go_repository(
+    name = "in_gopkg_yaml_v2",
+    importpath = "gopkg.in/yaml.v2",
+    tag = "v2.2.1",
+)
+
+go_repository(
+    name = "org_golang_x_net",
+    commit = "161cd47e91fd",
+    importpath = "golang.org/x/net",
+)
+
+go_repository(
+    name = "org_golang_x_sync",
+    commit = "1d60e4601c6f",
+    importpath = "golang.org/x/sync",
+)
+
+go_repository(
+    name = "org_golang_x_sys",
+    commit = "04f50cda93cb",
+    importpath = "golang.org/x/sys",
+)
+
+go_repository(
+    name = "org_golang_x_text",
+    importpath = "golang.org/x/text",
+    tag = "v0.3.0",
 )
