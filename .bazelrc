@@ -3,8 +3,13 @@ startup \
   --host_jvm_args=-Xms1024m \
 
 build \
-  --local_resources=2048,2.0,1.0
+  --local_resources=2048,2.0,1.0 \
+  --host_force_python=PY2
 
 test \
   --test_output=errors \
-  --test_verbose_timeout_warnings
+  --test_verbose_timeout_warnings \
+  --host_force_python=PY2
+
+run \
+  --host_force_python=PY2
