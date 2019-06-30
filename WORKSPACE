@@ -18,17 +18,15 @@ new_git_repository(
     shallow_since = "1503497108 +0300",
 )
 
-libsodium_version = "1.0.17"
+libsodium_version = "1.0.18"
 
 http_archive(
     name = "libsodium",
     build_file = "//:libsodium.BUILD",
-    sha256 = "0cc3dae33e642cc187b5ceb467e0ad0e1b51dcba577de1190e9ffa17766ac2b1",
+    sha256 = "6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1",
     strip_prefix = "libsodium-{}".format(libsodium_version),
     urls = [
-        "https://github.com/jedisct1/libsodium/releases/download/{v}/libsodium-{v}.tar.gz".format(
-            v = libsodium_version,
-        ),
+        "https://download.libsodium.org/libsodium/releases/libsodium-{}.tar.gz".format(libsodium_version),
     ],
 )
 
